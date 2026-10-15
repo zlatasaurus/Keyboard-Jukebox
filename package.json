@@ -1,0 +1,44 @@
+{
+  "name": "keyboard-jukebox",
+  "version": "1.0.0",
+  "description": "Plays a sound effect on every keystroke, system-wide",
+  "author": "zlatasaurus",
+  "main": "src/main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test",
+    "dist": "electron-builder --win portable",
+    "mixxx-mapping": "node tools/build-mixxx-mapping.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "uiohook-napi": "^1.5.5"
+  },
+  "devDependencies": {
+    "electron-builder": "^26.15.3",
+    "electron": "^44.7.2"
+  },
+  "build": {
+    "appId": "com.local.keyboardjukebox",
+    "productName": "Keyboard Jukebox",
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json",
+      "integrations/**/*"
+    ],
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "win": {
+      "target": "portable",
+      "signExecutable": false
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "npmRebuild": false,
+    "nodeGypRebuild": false,
+    "icon": "assets/icon.png"
+  }
+}

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- lock it down: only our own files get to run -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:">
+<title>Keyboard Jukebox</title>
+<!-- win98 look comes from nielssp/classic-stylesheets (MIT), copied into ./vendor/win98 -->
+<link rel="stylesheet" href="vendor/win98/layout.css">
+<link rel="stylesheet" href="vendor/win98/theme.css">
+<link rel="stylesheet" href="vendor/win98/skins/98.css">
+<link rel="stylesheet" href="styles/app.css">
+</head>
+<body class="desktop use-preferred-font">
+
+<!-- ============ PROGRAM 1: Keyboard Jukebox ============ -->
+<div class="app window active" id="win-jukebox">
+  <div class="title-bar">
+    <div class="title-bar-text">Keyboard Jukebox</div>
+    <div class="title-bar-buttons">
+      <button data-minimize aria-label="Minimize"></button>
+      <button data-maximize aria-label="Maximize"></button>
+      <button data-close aria-label="Close"></button>
+    </div>
+  </div>
+  <div class="window-body">
+
+  <fieldset class="padding status">
+    <div>
+      <span class="dot" id="dot"></span><b id="now"></b> &middot; <span id="count">0 keys</span>
+    </div>
+    <div class="row flush">
+      <label for="vol">Volume</label>
+      <input type="range" id="vol" min="0" max="1" step="0.05" value="0.6">
+      <button id="power" class="active" aria-pressed="true">Sounds ON</button>
+    </div>
+  </fieldset>
+
+  <fieldset class="padding">
+    <legend>Typing sound</legend>
+    <div class="sound-grid" id="sounds"></div>
+    <div class="row">
+      <button id="uploadBtn">Upload your own...</button>
+      <input type="file" id="file" accept="audio/*">
+      <span id="uploadMsg"></span>
+    </div>
+  </fieldset>
+
+  <fieldset class="padding">
+    <legend>Feel</legend>
+    <div class="row first"><label for="stereo">Stereo</label><input type="range" id="stereo" min="0" max="1" step="0.05" value="0.6"><span class="val" id="stereoV"></span></div>
+    <div class="row"><label for="humanize">Humanize</label><input type="range" id="humanize" min="0" max="100" step="5" value="30"><span class="val" id="humanizeV"></span></div>
+    <div class="row">
+      <button id="feelTest">Try it</button>
+      <span class="hint flush">Stereo puts each key where it sits on your keyboard (Q left, P right). Humanize nudges the pitch a tiny bit every press so it sounds less robotic.</span>
+    </div>
+  </fieldset>
+
+  <fieldset class="padding">
+    <legend>Tweak a sound</legend>
+    <div class="row first">
+      <label for="tweakSel">Editing</label>
+      <div class="dropdown"><select id="tweakSel" size="1"></select><div class="dropdown-button"></div></div>
+      <button id="preview">Preview</button>
+      <button id="reset">Reset</button>
+      <button id="del" style="display:none">Delete</button>
+    </div>
+    <div class="row"><label for="start">Start</label><input type="range" id="start" min="0" max="1" step="0.01" value="0"><span class="val" id="startV"></span></div>
+    <div class="row"><label for="end">End</label><input type="range" id="end" min="0" max="1" step="0.01" value="1"><span class="val" id="endV"></span></div>
+    <div class="row"><label for="pitch">Pitch</label><input type="range" id="pitch" min="-12" max="12" step="1" value="0"><span class="val" id="pitchV"></span></div>
+    <div class="row"><label for="quality">Quality</label>
+      <div class="dropdown">
+        <select id="quality" size="1">
+          <option value="high">High (clean)</option>
+          <option value="medium">Medium (a lil crunchy)</option>
+          <option value="low">Low (lo-fi)</option>
+          <option value="trash">Trash (crispy chaos)</option>
+        </select>
+        <div class="dropdown-button"></div>
+      </div>
+    </div>
+    <div class="hint" id="tweakHint"></div>
+  </fieldset>
+
+  <fieldset class="padding">
+    <legend>Typing history</legend>
+    <div class="status">
+      <span id="histTotal">Loading...</span>
+      <button id="openFolder">Open save folder</button>
+    </div>
+    <div id="chart"></div>
+    <div class="hint">A new bar gets saved every time you close the app (date + time are from your system clock).</div>
+  </fieldset>
+
+  <fieldset class="padding">
+    <legend>DJ mode</legend>
+    <div class="row first">
+      <input type="checkbox" id="djMode"><label for="djMode">DJ mode</label>
+      <label for="djTarget" class="sr">Send commands to</label>
+      <div class="dropdown">
+        <select id="djTarget" size="1">
+          <option value="builtin">Keyboard Jukebox DJ (built in)</option>
+          <option value="mixxx">Mixxx (MIDI)</option>
+        </select>
+        <div class="dropdown-button"></div>
+      </div>
+    </div>
+    <div class="row" id="mixxxBits">
+      <label for="midiOut">MIDI port</label>
+      <div class="dropdown"><select id="midiOut" size="1"></select><div class="dropdown-button"></div></div>
+      <button id="mixxxInstall">Install Mixxx mapping</button>
+    </div>
+    <div class="hint" id="djStatus"></div>
+    <table id="djTable"></table>
+    <div class="hint" id="djHintBuiltin">
+      Load tracks in Keyboard Jukebox DJ (taskbar, bottom of the screen). These shortcuts then work from any app.
+      Commands work even with Sounds OFF.
+    </div>
+    <div class="hint" id="djHintMixxx">
+      Setup: run loopMIDI with a port named "Keyboard Jukebox", pick it above, hit Install Mixxx mapping,
+      then in Mixxx go to Preferences &gt; Controllers &gt; Keyboard Jukebox, tick Enabled and load the
+      "Keyboard Jukebox" mapping. Commands work even with Sounds OFF.
+    </div>
+  </fieldset>
+
+  <fieldset class="padding">
+    <legend>Special triggers</legend>
+    <table id="triggerTable"></table>
+    <div class="hint">You can tweak any of these in the editor above too.</div>
+  </fieldset>
+
+  </div>
+  <div class="status-bar credits">Developed by <b>zlatasaurus</b> for <b>401HQ</b></div>
+</div>
+
+<!-- ============ PROGRAM 2: Keyboard Jukebox DJ ============ -->
+<div class="app app-wide window active" id="win-dj" hidden>
+  <div class="title-bar">
+    <div class="title-bar-text">Keyboard Jukebox DJ</div>
+    <div class="title-bar-buttons">
+      <button data-minimize aria-label="Minimize"></button>
+      <button data-maximize aria-label="Maximize"></button>
+      <button data-close aria-label="Close"></button>
+    </div>
+  </div>
+  <div class="window-body">
+    <div class="decks" id="decks"></div>
+    <fieldset class="padding">
+      <legend>Mixer</legend>
+      <div class="row first xfade-row">
+        <span>Deck 1</span>
+        <input type="range" id="xfader" min="-1" max="1" step="0.01" value="0" aria-label="Crossfader">
+        <span>Deck 2</span>
+        <button id="airhorn">Airhorn</button>
+      </div>
+    </fieldset>
+    <div class="hint">
+      Tip: turn on DJ mode in Keyboard Jukebox and these decks follow your keyboard from any app
+      (Alt + 1 / 2 picks the deck, Alt + 3 plays, type "dj drop"...). The highlighted deck is the one commands hit.
+    </div>
+  </div>
+  <div class="status-bar credits">Keyboard Jukebox DJ: vinyl-style decks, so tempo changes the pitch too</div>
+</div>
+
+<!-- one deck. cloned twice by ui/dj-window.js -->
+<template id="deckTemplate">
+  <fieldset class="padding deck">
+    <legend data-r="legend">Deck</legend>
+    <div class="deck-head">
+      <b data-r="title" class="deck-title">No track loaded</b>
+      <span data-r="bpm" class="lcd">--- BPM</span>
+    </div>
+    <canvas data-r="wave" class="wave" title="Click to jump"></canvas>
+    <div class="deck-time"><span data-r="time" class="lcd">0:00.0</span><span data-r="left" class="lcd">-0:00.0</span></div>
+    <div class="deck-buttons">
+      <button data-r="load">Load...</button>
+      <input type="file" accept="audio/*" data-r="file">
+      <button data-r="cue">Cue</button>
+      <button data-r="play">Play</button>
+      <button data-r="sync">Sync</button>
+      <button data-r="loop">Loop 4</button>
+      <button data-r="hotcue" title="First click sets it, then it jumps there">Hot 1</button>
+      <button data-r="fx">Echo</button>
+      <button data-r="brake">Brake</button>
+      <button data-r="spin">Spin</button>
+    </div>
+    <div class="row"><span class="lbl">Tempo</span><input type="range" data-r="tempo" min="-16" max="16" step="0.1" value="0" aria-label="Tempo"><span class="val" data-r="tempoV">+0.0%</span></div>
+    <div class="row"><span class="lbl">Volume</span><input type="range" data-r="vol" min="0" max="1" step="0.01" value="0.9" aria-label="Volume"></div>
+    <div class="row eq">
+      <span class="lbl">EQ</span>
+      <span>Lo</span><input type="range" data-r="eq-low" min="-24" max="6" step="1" value="0" aria-label="Low EQ">
+      <span>Mid</span><input type="range" data-r="eq-mid" min="-24" max="6" step="1" value="0" aria-label="Mid EQ">
+      <span>Hi</span><input type="range" data-r="eq-high" min="-24" max="6" step="1" value="0" aria-label="High EQ">
+    </div>
+  </fieldset>
+</template>
+
+<!-- ============ the taskbar, very 1998 ============ -->
+<div class="start-menu" id="startMenu" hidden>
+  <div class="start-side"><b>Keyboard</b>Jukebox 98</div>
+  <div class="start-items">
+    <button data-show="jukebox">Keyboard Jukebox</button>
+    <button data-show="dj">Keyboard Jukebox DJ</button>
+    <hr>
+    <button id="shutdown">Shut Down...</button>
+  </div>
+</div>
+<div class="taskbar">
+  <button id="startBtn" class="start-btn" aria-haspopup="true"><b>Start</b></button>
+  <span class="taskbar-sep"></span>
+  <button class="task" data-show="jukebox">Keyboard Jukebox</button>
+  <button class="task" data-show="dj">Keyboard Jukebox DJ</button>
+  <span class="tray" id="clock"></span>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
