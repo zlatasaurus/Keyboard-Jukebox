@@ -1,5 +1,6 @@
 // midi-out.js — sends DJ commands out a MIDI port using Web MIDI (built into electron, no native deps)
-// windows can't make virtual MIDI ports by itself, so u need loopMIDI running with a port open
+// windows can't make virtual MIDI ports by itself, so u need loopMIDI running with a port open.
+// macs have one built in: the IAC Driver (Audio MIDI Setup)
 import { MIDI_STATUS_ON, MIDI_STATUS_OFF } from '../config/dj-commands.js';
 
 let access = null, output = null;
@@ -24,7 +25,7 @@ export function select(name) {
 // best guess at the right port. NEVER the windows GS wavetable synth, that thing plays piano notes lmao
 export function guessPort(names) {
   const usable = names.filter(n => !/wavetable/i.test(n));
-  return usable.find(n => /jukebox|loopmidi|mixxx/i.test(n)) || usable[0] || '';
+  return usable.find(n => /jukebox|loopmidi|mixxx|iac/i.test(n)) || usable[0] || '';
 }
 
 // one command = one quick tap: note on, then note off 40ms later (cue uses the release)

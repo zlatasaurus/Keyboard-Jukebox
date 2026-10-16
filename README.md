@@ -4,21 +4,21 @@
 
 typing in discord? sound. writing an essay? sound. hit enter and u get the rizz sound. type "67" and u already know. it all runs on a fake windows 98 desktop because why not.
 
-> windows only for now.
+> works on **windows** and **mac** (intel + apple silicon).
 
 ## what it does
 
 - 🔊 **a sound on every keystroke**, system-wide (not just inside the app)
 - 🎛️ **10 typing sounds to pick from**: mechanical, minecraft click, camera shutter, lizard button, sans talking, anvil drop, censor bleep and more
-- ✨ **special triggers**: Enter = rizz, Ctrl+C = another one, Ctrl+Z = snapchat, Ctrl+A = flash bang, Ctrl+P = windows xp shutdown, and typing words like `67`, `claude` or `no mistakes` sets off their own sounds
+- ✨ **special triggers**: Enter = rizz, Ctrl+C = another one, Ctrl+Z = snapchat, Ctrl+A = flash bang, Ctrl+P = windows xp shutdown (Cmd on a mac), and typing words like `67`, `claude` or `no mistakes` sets off their own sounds
 - 🎚️ **make it feel right**: stereo panning (left keys play left, right keys play right) + humanize so it never sounds the same twice
 - 📤 **upload ur own sounds**, trim them, mess with the pitch
 - 📊 **typing history** so u can see how much u've been mashing
-- 🎧 **DJ mode**: two decks + a mixer with BPM detection, sync, loops, hotcues, EQ, echo, brake, spinback and an airhorn. with DJ mode on, Alt + number keys and typed "dj ..." words run the decks from any app. it can drive [Mixxx](integrations/mixxx/README.md) over MIDI too
+- 🎧 **DJ mode**: two decks + a mixer with BPM detection, sync, loops, hotcues, EQ, echo, brake, spinback and an airhorn. with DJ mode on, Alt (Option on mac) + number keys and typed "dj ..." words run the decks from any app. it can drive [Mixxx](integrations/mixxx/README.md) over MIDI too
 
 ## how to install
 
-### the easy way (just the .exe)
+### windows (just the .exe)
 
 1. go to the **Releases** page and download `Keyboard Jukebox 1.0.0.exe`
 2. put it somewhere u'll remember (desktop is fine)
@@ -27,6 +27,18 @@ typing in discord? sound. writing an essay? sound. hit enter and u get the rizz 
 5. start typing anywhere. u should hear it right away 🎉
 
 if u hear nothing: check ur system volume and make sure the jukebox window isn't muted.
+
+### mac (the .dmg)
+
+1. go to the **Releases** page and download the mac one for ur chip:
+   - `Keyboard-Jukebox-1.0.0-mac-arm64.dmg` for M1/M2/M3/M4 macs (apple menu > About This Mac says "Apple M...")
+   - `Keyboard-Jukebox-1.0.0-mac-x64.dmg` for older intel macs
+2. open it and drag **Keyboard Jukebox** into **Applications**
+3. first launch: **right-click** the app > **Open** > **Open**. (just double clicking gets u "can't be opened because Apple cannot check it", cuz i'm not paying apple $99/yr. if that dialog has no Open button, go to System Settings > Privacy & Security, scroll down and hit **Open Anyway**)
+4. mac will ask to let it **control ur computer**. that's the permission it needs to hear ur keyboard in other apps. hit **Open System Settings** and switch on **Keyboard Jukebox** under **Accessibility**
+5. it starts working the second u flip that switch, no restart. the app shows a red "Can't hear your keyboard" box until then
+
+on mac all the Ctrl shortcuts are **Cmd** (Cmd+C, Cmd+V...) and Alt is **Option**. the app shows the right names.
 
 ### the nerd way (from source)
 
@@ -39,7 +51,18 @@ npm install
 npm start
 ```
 
-want ur own portable .exe? `npm run dist` builds one into `dist/`.
+on mac, `npm start` runs inside Electron, so the Accessibility switch to flip is for ur **terminal app** (Terminal / iTerm / VS Code), not Keyboard Jukebox.
+
+want ur own build? `npm run dist:win` makes the portable .exe, `npm run dist:mac` makes the .dmgs (has to be run on a mac). both land in `dist/`.
+
+### releases build themselves
+
+pushing a tag like `v1.0.1` makes GitHub build the windows .exe AND the mac .dmgs on its own machines and put them on a new Release. no mac needed:
+
+```bash
+git tag v1.0.1
+git push origin v1.0.1
+```
 
 ## adding ur own trigger
 

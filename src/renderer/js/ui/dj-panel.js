@@ -5,20 +5,28 @@ import { state, setState, subscribe } from '../state.js';
 import { DJ_COMMANDS } from '../config/dj-commands.js';
 import * as midi from '../services/midi-out.js';
 import { bridge } from '../services/bridge.js';
+import { keyLabel, isMac } from '../services/platform.js';
 
 export function mountDjPanel({ runBuiltin }) {
   const toggle = $('djMode'), targetSel = $('djTarget'), portSel = $('midiOut'), status = $('djStatus');
+
+  // macs have a virtual MIDI cable built in (IAC Driver), no loopMIDI needed
+  if (isMac) {
+    $('djHintMixxx').textContent = 'Setup: open Audio MIDI Setup > Window > Show MIDI Studio, double-click IAC Driver and tick '
+      + '"Device is online". Pick it above, hit Install Mixxx mapping, then in Mixxx go to Settings > Controllers, '
+      + 'pick the IAC port, tick Enabled and load the "Keyboard Jukebox" mapping. Commands work even with Sounds OFF.';
+  }
   const say = (msg) => { status.textContent = msg; };
   const mixxx = () => state.djTarget === 'mixxx';
 
   // ---- cheat sheet, straight from the protocol file ----
   $('djTable').replaceChildren(...DJ_COMMANDS.map(c =>
-    el('tr', { id: 'dj-' + c.id }, [el('td', { textContent: c.hint }), el('td', { textContent: c.label })])));
+    el('tr', { id: 'dj-' + c.id }, [el('td', { textContent: keyLabel(c.hint) }), el('td', { textContent: c.label })])));
 
   // ---- port picker (only matters for Mixxx) ----
   function renderPorts(names) {
     const opts = names.map(n => el('option', { value: n, textContent: n }));
-    if (!opts.length) opts.push(el('option', { value: '', textContent: '(no MIDI ports, is loopMIDI open?)' }));
+    if (!opts.length) opts.push(el('option', { value: '', textContent: isMac ? '(no MIDI ports, is the IAC Driver on?)' : '(no MIDI ports, is loopMIDI open?)' }));
     portSel.replaceChildren(...opts);
     // keep the saved port if its around, otherwise guess
     const pick = names.includes(state.midiOut) ? state.midiOut : midi.guessPort(names);

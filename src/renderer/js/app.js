@@ -21,6 +21,7 @@ import { mountTweakPanel } from './ui/tweak-panel.js';
 import { mountTriggerTable } from './ui/trigger-table.js';
 import { mountHistoryChart } from './ui/history-chart.js';
 import { mountDesktop } from './ui/desktop.js';
+import { mountHookWarning } from './ui/hook-warning.js';
 import { mountDjWindow } from './ui/dj-window.js';
 import { createMixer } from './dj/mixer.js';
 import { createDjController } from './dj/controller.js';
@@ -34,6 +35,7 @@ async function boot() {
   audio.ensureAudio();
 
   mountDesktop();
+  mountHookWarning();
   mountTitleBar();
   mountTriggerTable();
   const status = mountStatusPanel();

@@ -7,8 +7,10 @@
   "scripts": {
     "start": "electron .",
     "test": "node --test",
+    "mixxx-mapping": "node tools/build-mixxx-mapping.mjs",
     "dist": "electron-builder --win portable",
-    "mixxx-mapping": "node tools/build-mixxx-mapping.mjs"
+    "dist:win": "electron-builder --win portable",
+    "dist:mac": "electron-builder --mac"
   },
   "license": "MIT",
   "dependencies": {
@@ -33,6 +35,21 @@
     "win": {
       "target": "portable",
       "signExecutable": false
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "public.app-category.music",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "artifactName": "Keyboard-Jukebox-${version}-mac-${arch}.${ext}"
     },
     "directories": {
       "output": "dist"

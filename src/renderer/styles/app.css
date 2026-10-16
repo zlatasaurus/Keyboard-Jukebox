@@ -86,3 +86,7 @@ tr.hit td { background:var(--selection-bg); color:var(--selection-fg); } /* DJ c
 .deck .lbl { min-width:54px; }
 .deck .eq input[type=range] { min-width:60px; }
 .xfade-row input[type=range] { min-width:200px; }
+
+/* "can't hear your keyboard" box (mac permission) */
+.hook-warn legend { background:#800000; color:#fff; padding:0 4px; }
+.hook-warn-text { flex:1; min-width:240px; }

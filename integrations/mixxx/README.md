@@ -16,6 +16,16 @@ It only talks MIDI, so none of Mixxx's GPL code is in this project.
 4. In Mixxx: Preferences > Controllers > `Keyboard Jukebox` > tick **Enabled**,
    choose the **Keyboard Jukebox** mapping and click Apply.
 
+## Setup (mac)
+
+1. Open **Audio MIDI Setup** > Window > **Show MIDI Studio**, double-click **IAC Driver**, tick
+   **Device is online**. It's the built-in virtual MIDI cable, so no loopMIDI is needed.
+2. In Keyboard Jukebox, tick **DJ mode**, set it to **Mixxx (MIDI)** and pick the IAC port.
+3. Click **Install Mixxx mapping** (run Mixxx once first so its settings folder exists).
+4. In Mixxx: Settings > Controllers > the IAC port > tick **Enabled**, choose **Keyboard Jukebox**, Apply.
+
+Shortcuts are **Option** + number on mac.
+
 ## Commands
 
 | Trigger | Does |

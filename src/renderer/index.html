@@ -27,6 +27,15 @@
   </div>
   <div class="window-body">
 
+  <!-- only shows up when the key hook isn't running (on a mac: Accessibility permission not given yet) -->
+  <fieldset class="padding hook-warn" id="hookWarn" hidden>
+    <legend>Can't hear your keyboard</legend>
+    <div class="row first">
+      <span id="hookWarnText" class="hook-warn-text"></span>
+      <button id="hookFix">Open Settings</button>
+    </div>
+  </fieldset>
+
   <fieldset class="padding status">
     <div>
       <span class="dot" id="dot"></span><b id="now"></b> &middot; <span id="count">0 keys</span>

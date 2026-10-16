@@ -36,4 +36,15 @@ const describeKey = (code) => NAMED[code] || CHARS[code] || null;
 // -1 = hard left, 0 = middle, 1 = hard right. keys we dont know about sit in the middle
 const keyPan = (code) => X[code] == null ? 0 : Math.max(-1, Math.min(1, (X[code] / WIDTH) * 2 - 1));
 
-module.exports = { isModifier, describeKey, keyPan };
+// which modifiers count as what. the rest of the app only knows "ctrl" = the shortcut key,
+// and on a mac that's Cmd, so Cmd+C gets the ctrl+c sound like ur muscle memory expects
+function shortcutMods(e, platform = process.platform) {
+  const mac = platform === 'darwin';
+  return {
+    ctrl: mac ? !!e.metaKey : !!e.ctrlKey,
+    alt: !!e.altKey, // Option on a mac
+    shift: !!e.shiftKey,
+  };
+}
+
+module.exports = { isModifier, describeKey, keyPan, shortcutMods };

@@ -10,9 +10,10 @@ Two programs on one fake Windows 98 desktop, switched from the taskbar / Start m
   decks from any app. They can drive [Mixxx](integrations/mixxx/README.md) over MIDI instead.
 
 ```
-npm start       # run it
-npm test        # unit tests (triggers, keycodes, stereo/humanize, DJ decks + BPM, Mixxx mapping)
-npm run dist    # build the portable .exe into dist/
+npm start           # run it
+npm test            # unit tests (triggers, keycodes, stereo/humanize, DJ decks + BPM, Mixxx mapping)
+npm run dist:win    # portable .exe into dist/ (npm run dist does the same)
+npm run dist:mac    # .dmg for arm64 + x64 into dist/ (must run on a mac)
 ```
 
 ## Where stuff lives
@@ -31,6 +32,7 @@ src/
     ipc.js              every message the page can send
     mixxx.js            copies the DJ mapping into Mixxx
     paths.js            file locations
+    permissions.js      macOS Accessibility check (the OS blocks key hooks until the user allows it)
   preload/index.js      the window.jukebox bridge
   renderer/             the page (ES modules, no bundler)
     index.html          markup only
@@ -45,9 +47,10 @@ src/
       core/feel.js      stereo pan + humanize math
       audio/            engine (context, buffers, play), synth (+ airhorn), effects
       dj/               Keyboard Jukebox DJ: analysis (BPM + waveform), transport math, deck, mixer, controller
-      services/         settings (localStorage), uploads (IndexedDB), sound library, bridge
+      services/         settings (localStorage), uploads (IndexedDB), sound library, bridge, platform (Cmd/Option labels on mac)
       ui/               one file per panel/window (desktop.js = taskbar + Start menu)
 tools/                  build-mixxx-mapping.mjs (npm run mixxx-mapping)
+.github/workflows/       build.yml: builds windows + mac on GitHub, tag v* = auto Release
 test/                   node --test
 ```
 
@@ -56,3 +59,16 @@ test/                   node --test
 Drop the mp3 in `assets/sounds/` and add one line to `TRIGGERS` in
 `src/renderer/js/config/sounds.js`. The key handler, the editor dropdown and
 the cheat-sheet table all read from that list.
+
+## Windows vs mac
+
+One codebase. The only platform checks:
+
+- `src/main/keycodes.js` `shortcutMods`: on mac, **Cmd** is reported as `ctrl`, so every "Ctrl + X" trigger fires on Cmd + X.
+- `src/main/permissions.js` + `ui/hook-warning.js`: on mac the key hook waits for Accessibility permission,
+  polls every 2s, and starts on its own once it's granted. The page shows a red box until then.
+- `services/platform.js` `keyLabel`: shows Cmd / Option instead of Ctrl / Alt in the tables.
+- `src/main/mixxx.js`: Mixxx's settings folder per OS. `services/midi-out.js` prefers the mac IAC Driver.
+
+Mac builds are ad-hoc signed (`"identity": "-"`, no Apple Developer account), so users right-click > Open the first time.
+Scancodes come from uiohook, which uses the same codes on every OS, so key position / panning needs no mac table.

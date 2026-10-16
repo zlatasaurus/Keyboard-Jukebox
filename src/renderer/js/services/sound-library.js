@@ -3,10 +3,11 @@ import * as audio from '../audio/engine.js';
 import * as uploads from './uploads-db.js';
 import { TYPING_SOUNDS, TRIGGERS, DEFAULT_TYPING, soundUrl } from '../config/sounds.js';
 import { state, setState, setCfg, cfgOf } from '../state.js';
+import { keyLabel } from './platform.js';
 
 export const typingSounds = () => [...TYPING_SOUNDS, ...state.custom];
 export const isUpload = (id) => state.custom.some(s => s.id === id);
-export const triggerLabel = (t) => `${t.hint}: ${t.label}`;
+export const triggerLabel = (t) => `${keyLabel(t.hint)}: ${t.label}`;
 export function labelOf(id) {
   const t = TRIGGERS.find(s => s.id === id);
   return t ? triggerLabel(t) : typingSounds().find(s => s.id === id)?.label || id;
